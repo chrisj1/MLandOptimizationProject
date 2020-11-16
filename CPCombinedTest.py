@@ -14,15 +14,15 @@ from CPCombined import *
 Size = 200
 Rank = 50
 
-b0 = 1
-eta_ada = 1
+b0 = .05
+eta_ada = .1
 
-lamb = .01
+lamb = .25
 
-proprtions = np.linspace(.01, 1, num = 10)
+proprtions = np.linspace(.01, 1, num = 5)
 
-eps = 1/(len(proprtions))
-eta_cpd = sqrt(2 * log(len(proprtions)))
+eps = 1/(2*len(proprtions))
+eta_cpd =.39
 
 
 X = createTensor(Size,Rank)
@@ -34,9 +34,8 @@ A, B, C = A_init[0], A_init[1], A_init[2]
 numberOfFibers = Size**2
 FibersSampled = (numberOfFibers * proprtions).astype(int)
 
-n_mb = 100#200*200//5#FibersSampled[5]
 norm_x = linalg.norm(X)
 
 
 
-decompose(X, Rank, proprtions, lamb, eps, eta_cpd, A_init, 100, b0, n_mb)
+decompose(X, Rank, proprtions, lamb, eps, eta_cpd, A_init, 1000, b0, eta_ada)

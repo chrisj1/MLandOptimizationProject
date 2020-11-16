@@ -143,3 +143,11 @@ def videoToTensor(filename):
 
     X = X[:s, :s, :s]
     return X
+
+def weightsStr(weights, sketching_rates):
+    o = ''
+    for i,w in enumerate(weights):
+        s = sketching_rates[i%len(sketching_rates)]
+        o+='Grad  ' if i < len(sketching_rates) else 'Newton'
+        o+=f'   {s}  {w/np.sum(weights)}\n'
+    return o
