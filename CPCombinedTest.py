@@ -10,9 +10,13 @@ import matplotlib.pyplot as plt
 from math import sqrt, log
 import tensorly as tl
 from CPCombined import *
+import matplotlib as mpl
+import matplotlib.cm as cm
+import matplotlib.patches as mpatches
+import matplotlib.lines as mlines
 
-Size = 200
-Rank = 50
+Size = 500
+Rank = 100
 
 b0 = .05
 eta_ada = .1
@@ -22,8 +26,8 @@ lamb = .25
 proprtions = np.linspace(.01, 1, num = 5)
 
 eps = 1/(2*len(proprtions))
-eta_cpd =.39
-
+eta_cpd =.5
+max_time = 300
 
 X = createTensor(Size,Rank)
 
@@ -31,11 +35,108 @@ A_init = initDecomposition(Size,Rank)
 
 A, B, C = A_init[0], A_init[1], A_init[2]
 
-numberOfFibers = Size**2
-FibersSampled = (numberOfFibers * proprtions).astype(int)
-
 norm_x = linalg.norm(X)
 
+sketching_rates = [(p, True) for p in proprtions] + [(p, False) for p in proprtions]
+
+A, B, C, NRE_A, weights = decompose(X, Rank, sketching_rates, lamb, eps, eta_cpd, A_init, max_time, b0, eta_ada)
+print(NRE_A)
+fig, (ax1, ax2) = plt.subplots(2, 1)
+fig.suptitle('Error and Weights for Decomposition')
+viridis = cm.get_cmap('viridis', len(proprtions))
+ax1.set_title('Normalized Error')
+
+handles = [mpatches.Patch(color=viridis(p), label=f'{p} sketching rate') for p in proprtions]
+handles = handles + [mlines.Line2D([], [], color='black', marker='o', label='Gradient'),
+mlines.Line2D([], [], color='black', marker='+', label='Newton\'s method')
+]
+# handles.append()
+ax1.legend(handles=handles)
+ax1.set_yscale('log')
+for t in NRE_A:
+    e, grad, s = NRE_A[t]
+    m = 'o' if grad else 'x'
+    ax1.scatter([t], [e], color=viridis(s), marker=m)
+
+weights_t = list(weights.keys())
+ax2.set_yscale('log')
+ax2.set_title('Probability Wieghts')
+for i in range(0,len(sketching_rates)):
+    weight_y = []
+    for t in weights_t:
+        weight_y.append(weights[t][i])
+    m = 'o' if sketching_rates[i][1] else 'x'
+    ax2.plot(weights_t,weight_y, color=viridis(sketching_rates[i][0]), marker=m)
+ax2.legend(handles=handles)
+plt.show(block = False)
 
 
-decompose(X, Rank, proprtions, lamb, eps, eta_cpd, A_init, 1000, b0, eta_ada)
+
+sketching_rates = [(p, True) for p in proprtions]
+
+A, B, C, NRE_A, weights = decompose(X, Rank, sketching_rates, lamb, eps, eta_cpd, A_init, max_time, b0, eta_ada)
+print(NRE_A)
+fig, (ax1, ax2) = plt.subplots(2, 1)
+fig.suptitle('Error and Weights for Decomposition')
+viridis = cm.get_cmap('viridis', len(proprtions))
+ax1.set_title('Normalized Error')
+
+handles = [mpatches.Patch(color=viridis(p), label=f'{p} sketching rate') for p in proprtions]
+handles = handles + [mlines.Line2D([], [], color='black', marker='o', label='Gradient'),
+mlines.Line2D([], [], color='black', marker='+', label='Newton\'s method')
+]
+# handles.append()
+ax1.legend(handles=handles)
+ax1.set_yscale('log')
+for t in NRE_A:
+    e, grad, s = NRE_A[t]
+    m = 'o' if grad else 'x'
+    ax1.scatter([t], [e], color=viridis(s), marker=m)
+
+weights_t = list(weights.keys())
+ax2.set_yscale('log')
+ax2.set_title('Probability Wieghts')
+for i in range(0,len(sketching_rates)):
+    weight_y = []
+    for t in weights_t:
+        weight_y.append(weights[t][i])
+    m = 'o' if sketching_rates[i][1] else 'x'
+    ax2.plot(weights_t,weight_y, color=viridis(sketching_rates[i][0]), marker=m)
+ax2.legend(handles=handles)
+plt.show(block = False)
+
+
+
+sketching_rates = [(p, False) for p in proprtions]
+
+A, B, C, NRE_A, weights = decompose(X, Rank, sketching_rates, lamb, eps, eta_cpd, A_init, max_time, b0, eta_ada)
+print(NRE_A)
+fig, (ax1, ax2) = plt.subplots(2, 1)
+fig.suptitle('Error and Weights for Decomposition')
+viridis = cm.get_cmap('viridis', len(proprtions))
+ax1.set_title('Normalized Error')
+
+handles = [mpatches.Patch(color=viridis(p), label=f'{p} sketching rate') for p in proprtions]
+handles = handles + [mlines.Line2D([], [], color='black', marker='o', label='Gradient'),
+mlines.Line2D([], [], color='black', marker='+', label='Newton\'s method')
+]
+# handles.append()
+ax1.legend(handles=handles)
+ax1.set_yscale('log')
+for t in NRE_A:
+    e, grad, s = NRE_A[t]
+    m = 'o' if sketching_rates[i][1] else 'x'
+    ax1.scatter([t], [e], color=viridis(s), marker=m)
+
+weights_t = list(weights.keys())
+ax2.set_yscale('log')
+ax2.set_title('Probability Wieghts')
+for i in range(0,len(sketching_rates)):
+    weight_y = []
+    for t in weights_t:
+        weight_y.append(weights[t][i])
+    m = 'o' if sketching_rates[i][1] else 'x'
+    ax2.plot(weights_t,weight_y, color=viridis(sketching_rates[i][0]), marker=m)
+ax2.legend(handles=handles)
+plt.show()
+

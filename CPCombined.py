@@ -17,8 +17,8 @@ def sketching_weight(sketching_rate, weights):
 	for i, w in enumerate(weights):
 		total_sum += w
 		if total_sum > r:
-			return sketching_rate[i%len(sketching_rate)], i < len(sketching_rate)
-	return len(sketching_rate)-1, i < len(sketching_rate)
+			return sketching_rate[i][0], sketching_rate[i][1]
+	return sketching_rate[-1][0], sketching_rate[-1][1]
 
 
 def sketch_indices(s, total_col):
@@ -108,8 +108,8 @@ def update_weights(
 	old_error = error(X_unfold[0], norm_x, A, B, C)
 	for i, w in enumerate(weights):
 		start = time.time()
-		s = sketching_rates[i % len(sketching_rates)]
-		if i<len(sketching_rates):
+		s, grad = sketching_rates[i]
+		if grad:
 			A_new,B_new,C_new, _ = AdaIteration(X, X_unfold, A, B, C, b0, eta_ada, F, {}, int(s * dim_1**2), norm_x, None, False)
 		else:
 			A_new, B_new, C_new = update_factors(A, B, C, X_unfold, Id, lamb, s, rank)
@@ -125,11 +125,12 @@ def update_weights(
 		)
 
 	weights /= np.sum(weights)
-	return
 
 # X, Rank, proprtions, lamb, eps, eta_cpd, A_init, 1000, b0, eta_ada
 def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, eta_ada):
-	weights = np.array([1] * (2 * len(sketching_rates))) / (2*len(sketching_rates))
+	weights = np.array([1] * (len(sketching_rates))) / (len(sketching_rates))
+	global Gt
+	Gt = {}
 
 	dim_1, dim_2, dim_3 = X.shape
 	A, B, C = Hinit[0], Hinit[1], Hinit[2]
@@ -142,7 +143,7 @@ def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, et
 	PP = tl.kruskal_to_tensor((np.ones(F), [A,B,C]))
 	e = np.linalg.norm(X - PP) ** 2/norm_x
 
-	NRE_A = {0:e}
+	NRE_A = {}
 	prev_e = e
 
 	start = time.time()
@@ -150,15 +151,19 @@ def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, et
 	sketching_rates_selected = {}
 	now = time.time()
 	itr = 1
+
+	weights_record = {}
+	weights_record[0] = list(weights)
 	while now - start < max_time:
 		s, grad = sketching_weight(sketching_rates, weights)
 		if not grad:
 			# Solve Ridge Regression for A,B,C
 			A, B, C = update_factors(A, B, C, X_unfold, I, lamb, s, F)
 		else:
-			A,B,C, NRE_A = AdaIteration(X, X_unfold, A, B, C, b0,eta_ada, F, NRE_A, int(s * dim_1**2), norm_x,start, True)
+			A,B,C, _ = AdaIteration(X, X_unfold, A, B, C, b0,eta_ada, F, None, int(s * dim_1**2), norm_x,start, False)
 		
 		# Update weights
+		updated = False
 		p = np.random.binomial(n=1, p=eps)
 		if p == 1 and len(sketching_rates) > 1:
 			print('updating_weights:')
@@ -168,14 +173,17 @@ def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, et
 			)
 			print(f'Weights updated in {time.time() - weights_t}:')
 			print(weightsStr(weights, sketching_rates))
-		now = time.time()            
+			updated = True
+		now = time.time()
+		if updated:
+			weights_record[now - start] = list(weights)
 		e = error(X_unfold[0], norm_x, A, B, C)
 		elapsed = now - start
-		NRE_A[elapsed] = (e)
+		NRE_A[elapsed] = (e, grad, s)
 		
 		sketching_rates_selected[elapsed] = s
 
-		print(f"Iteration Summary:\nIteration: {itr}\nAlgorithim: {'grad' if grad else 'newton'}\nSketching Rate: {s}\nError: {e}\nChange in error: {prev_e - e}\nRelative Change in error: {(prev_e - e)/prev_e}\n")
+		print(f"Iteration Summary:\nIteration: {itr}\nAlgorithim: {'grad' if grad else 'newton'}\nSketching Rate: {s}\nError: {e}\nChange in error: {prev_e - e}\nRelative Change in error: {(prev_e - e)/prev_e}\nElapsed: {now - start}")
 		itr+=1
 		prev_e = e
-	return (A, B, C, NRE_A,sketching_rates_selected)
+	return (A, B, C, NRE_A, weights_record)
