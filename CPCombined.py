@@ -48,16 +48,16 @@ def update_factors(A, B, C, X_unfold, Id, lamb, s, rank):
 
 	return A, B, C
 
-Gt = {}
+Gt = []
 def AdaIteration(X, X_unfold,A_mat, B_mat, C_mat, b0, eta, F, errors, n_mb, norm_x,start,sampleErrors):
 	global Gt
 
 	dim_vec = X.shape
 	dim = len(X.shape)
-	if n_mb not in Gt:
-		Gt[n_mb] = [b0 for _ in range(dim)]
+	if Gt == []:
+		Gt = [b0 for _ in range(dim)]
 	A = [A_mat,B_mat,C_mat]
-	mu = 1
+	mu = 0
 	for i in range(1):
 		# randomly permute the dimensions
 		block_vec = np.random.permutation(dim)
@@ -85,9 +85,9 @@ def AdaIteration(X, X_unfold,A_mat, B_mat, C_mat, b0, eta, F, errors, n_mb, norm
 		)
 
 		# compute the accumlated gradient
-		Gt[n_mb][d_update] = np.abs(np.square(g)) + Gt[n_mb][d_update]
+		Gt[d_update] = np.abs(np.square(g)) + Gt[d_update]
 
-		eta_adapted = np.divide(eta, np.sqrt(Gt[n_mb][d_update]))
+		eta_adapted = np.divide(eta, np.sqrt(Gt[d_update]))
 
 		d = d_update
 
@@ -130,7 +130,7 @@ def update_weights(
 def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, eta_ada):
 	weights = np.array([1] * (len(sketching_rates))) / (len(sketching_rates))
 	global Gt
-	Gt = {}
+	Gt = []
 
 	dim_1, dim_2, dim_3 = X.shape
 	A, B, C = Hinit[0], Hinit[1], Hinit[2]

@@ -15,7 +15,7 @@ import matplotlib.cm as cm
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 
-Size = 500
+Size = 400
 Rank = 100
 
 b0 = .05
@@ -26,8 +26,8 @@ lamb = .25
 proprtions = np.linspace(.01, 1, num = 5)
 
 eps = 1/(2*len(proprtions))
-eta_cpd =.5
-max_time = 300
+eta_cpd =10
+max_time = 600
 
 X = createTensor(Size,Rank)
 
@@ -129,7 +129,6 @@ for t in NRE_A:
     ax1.scatter([t], [e], color=viridis(s), marker=m)
 
 weights_t = list(weights.keys())
-ax2.set_yscale('log')
 ax2.set_title('Probability Wieghts')
 for i in range(0,len(sketching_rates)):
     weight_y = []
