@@ -4,6 +4,8 @@ import tensorly.tenalg as tl_alg
 import numpy.matlib as matlib
 import time
 import pickle
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 from numpy import r_
 
@@ -11,7 +13,7 @@ import cv2
 
 from cv2 import VideoWriter, VideoWriter_fourcc
 
-def initDecomposition(Size, F):
+def initDecomposition(Size, F, min=0, max=1):
     # initialize the latent factors
     Hinit = []
     for d in range(3):
@@ -76,20 +78,6 @@ def error(X0, norm_x, A, B, C):
     X_bar = A @ (tl_alg.khatri_rao([A, B, C], skip_matrix=0).T)
     return tl.norm(X0 - X_bar)/norm_x
 
-def tensorToVideo(X, name):
-    X = X * 256
-
-    width, height, frames = X.shape
-    FPS = 30
-
-    fourcc = VideoWriter_fourcc(*'MP42')
-    video = VideoWriter(name + '.avi', fourcc, float(FPS), (width, height))
-
-    for i in range(frames):
-        frame = np.uint8(np.kron(X[...,i], np.array([1,1,1])))
-        video.write(frame)
-    video.release()
-
 def save_trial_data(algo, X, GT, timing, MSE, NRE, A, params):
     t = time.time()
     name = "data/" + algo + "-" + str(t) + ".dat"
@@ -151,3 +139,17 @@ def weightsStr(weights, sketching_rates):
         o+='Grad  ' if grad else 'Newton'
         o+=f'   {s}  {w/np.sum(weights)}\n'
     return o
+
+
+def saveTensorVideo(saveTensor, filename, cut=True, interval=75, cmap='gray'):
+    fig = plt.figure()
+    img = plt.imshow(saveTensor[0][cut:-cut, cut:-cut], animated=True, vmax=0, vmin=256, cmap=cmap)
+
+    def updatefig(i):
+        print(i)
+        img.set_array(saveTensor[i][cut:-cut, cut:-cut])
+        return img,
+
+    ani = animation.FuncAnimation(fig, updatefig, frames=saveTensor.shape[0],                                  interval=interval, blit=True)
+    plt.colorbar()
+    ani.save(filename, writer="ffmpeg", fps=15)
