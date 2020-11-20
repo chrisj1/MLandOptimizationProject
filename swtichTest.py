@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from math import sqrt, log
 import tensorly as tl
 
-Size = 200
+Size = 300
 Rank = 50
 
 b0 = 1

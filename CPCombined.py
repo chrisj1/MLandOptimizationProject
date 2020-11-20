@@ -103,7 +103,6 @@ def AdaIteration(X, X_unfold,A_mat, B_mat, C_mat, b0, eta, F, errors, n_mb, norm
 def update_weights(
 	X, A, B, C, X_unfold, Id, norm_x, lamb, weights, sketching_rates, rank, eta_cpd, eps, b0, eta_ada, F
 ):
-	t_sum = 0
 	dim_1, dim_2, dim_3 = X.shape
 	old_error = error(X_unfold[0], norm_x, A, B, C)
 	for i, w in enumerate(weights):
@@ -154,6 +153,8 @@ def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, et
 
 	weights_record = {}
 	weights_record[0] = list(weights)
+	total_update_time = 0
+	times_updated = 0
 	while now - start < max_time:
 		s, grad = sketching_weight(sketching_rates, weights)
 		if not grad:
@@ -165,10 +166,10 @@ def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, et
 		# Update weights
 		updated = False
 		p = np.random.binomial(n=1, p=eps)
-		if p == 1 and len(sketching_rates) > 1:
+		if p == 1 and len(sketching_rates) > 1 and itr > 4:
 			print('updating_weights:')
 			weights_t = time.time()
-			update_weights(
+			total_update_time = update_weights(
 				X, A, B, C, X_unfold, I, norm_x, lamb, weights, sketching_rates, F, eta_cpd, eps, b0, eta_ada, F
 			)
 			print(f'Weights updated in {time.time() - weights_t}:')
