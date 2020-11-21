@@ -1,2 +1,2 @@
-python3 AdaTime.py
-python3 CPDMWUTime.py
+pythonw AdaTime.py
+pythonw CPDMWUTime.py
