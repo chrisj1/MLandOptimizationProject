@@ -39,7 +39,12 @@ def saveAdaTimeTrial(X, fiberPropotion, Size, trial, Rank,b0, max_time, error,di
 def runTest(conf):
     fiberPropotion, Size, trial, Rank, max_time,dir = conf
     print("Running video trial with the following:\n\tProporion of Fibers = {}\n\tSize = {}\n\tRank = {}\n\tTrialNumber = {}\n\tMax Time = {}".format(fiberPropotion, Size, Rank, trial, maxtime))
-    numberOfFibers = Size[0]*Size[1]
+    
+    t = 1
+    for s in Size:
+        t *= s
+
+    numberOfFibers = s
     FibersSampled = max(int(numberOfFibers * fiberPropotion),1)
 
     #Create tensor
