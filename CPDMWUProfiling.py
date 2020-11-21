@@ -58,13 +58,20 @@ for i0 in range(len(Fs)):
             shape = (300, 300, 300)
             nu = 2
 
-            #CPD_MWU(X, F, sketching_rates, lamb, eps, nu, Hinit, mttkrps=30):
+            # CPD_MWU(X, F, sketching_rates, lamb, eps, nu, Hinit, mttkrps=30):
             A, B, C, error, res_time = CPD_MWU(
-                X, F, sketching_rates, lamb, np.finfo(float).eps ** 2, nu, Hinit, mttkrps=30
+                X,
+                F,
+                sketching_rates,
+                lamb,
+                np.finfo(float).eps ** 2,
+                nu,
+                Hinit,
+                mttkrps=30,
             )
 
             print(error)
 
             params = {}
             # def save_trial_data(algo, X, GT, timing, MSE, NRE, A, params):
-            save_trial_data("CPDMWU", X, A_gt, res_time, None, error, [A,B,C], params)
+            save_trial_data("CPDMWU", X, A_gt, res_time, None, error, [A, B, C], params)

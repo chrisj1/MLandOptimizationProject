@@ -13,6 +13,7 @@ import cv2
 
 from cv2 import VideoWriter, VideoWriter_fourcc
 
+
 def initDecomposition(Size, F, min=0, max=1):
     # initialize the latent factors
     Hinit = []
@@ -20,7 +21,8 @@ def initDecomposition(Size, F, min=0, max=1):
         Hinit.append(np.random.random((Size, F)))
     return Hinit
 
-def createTensor(size,F):
+
+def createTensor(size, F):
     X = np.zeros((size, size, size))
 
     # generate true latent factors
@@ -35,17 +37,18 @@ def createTensor(size,F):
         X[:, :, k] = A[0] @ np.diag(A[2][k, :]) @ np.transpose(A[1])
     return X
 
+
 def sample_fibers(n_fibers, dim_vec, d):
     dim_len = len(dim_vec)
     tensor_idx = np.zeros((n_fibers, dim_len))
 
     # randomly select fibers for dimensions not d
-    for i in r_[0 : d, d + 1 : dim_len]:
+    for i in r_[0:d, d + 1 : dim_len]:
         tensor_idx[:, i] = np.random.random_integers(
             0, high=dim_vec[i] - 1, size=(n_fibers)
         )
 
-    factor_idx = tensor_idx[:, r_[0 : d, d + 1 : dim_len]]
+    factor_idx = tensor_idx[:, r_[0:d, d + 1 : dim_len]]
 
     tensor_idx = tl.tenalg.kronecker([tensor_idx, np.ones((dim_vec[d], 1))])
 
@@ -71,12 +74,15 @@ def lookup(x, idx):
         ret = ret[int(i)]
     return np.array(ret)
 
+
 def proxr(Hb, d):
     return Hb
 
+
 def error(X0, norm_x, A, B, C):
     X_bar = A @ (tl_alg.khatri_rao([A, B, C], skip_matrix=0).T)
-    return tl.norm(X0 - X_bar)/norm_x
+    return tl.norm(X0 - X_bar)
+
 
 def save_trial_data(algo, X, GT, timing, MSE, NRE, A, params):
     t = time.time()
@@ -92,6 +98,7 @@ def save_trial_data(algo, X, GT, timing, MSE, NRE, A, params):
     }
     with open(name, "wb") as f:
         pickle.dump(data, f)
+
 
 def synteticTensor(I, F):
     X = np.zeros((I[0], I[1], I[2]))
@@ -109,6 +116,7 @@ def synteticTensor(I, F):
 
     return X, A_gt
 
+
 def videoToTensor(filename):
     cap = cv2.VideoCapture(filename)
     frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -120,7 +128,7 @@ def videoToTensor(filename):
     fc = 0
     ret = True
 
-    while (fc < frameCount):
+    while fc < frameCount:
         ret, frame = cap.read()
         X[fc] = frame[:, :, 0]
         fc += 1
@@ -132,24 +140,29 @@ def videoToTensor(filename):
     X = X[:s, :s, :s]
     return X
 
+
 def weightsStr(weights, sketching_rates):
-    o = ''
-    for i,w in enumerate(weights):
+    o = ""
+    for i, w in enumerate(weights):
         s, grad = sketching_rates[i]
-        o+='Grad  ' if grad else 'Newton'
-        o+=f'   {s}  {w/np.sum(weights)}\n'
+        o += "Grad  " if grad else "Newton"
+        o += f"   {s}  {w/np.sum(weights)}\n"
     return o
 
 
-def saveTensorVideo(saveTensor, filename, cut=True, interval=75, cmap='gray'):
+def saveTensorVideo(saveTensor, filename, cut=True, interval=75, cmap="gray"):
     fig = plt.figure()
-    img = plt.imshow(saveTensor[0][cut:-cut, cut:-cut], animated=True, vmax=0, vmin=256, cmap=cmap)
+    img = plt.imshow(
+        saveTensor[0][cut:-cut, cut:-cut], animated=True, vmax=256, vmin=0, cmap=cmap
+    )
 
     def updatefig(i):
         print(i)
         img.set_array(saveTensor[i][cut:-cut, cut:-cut])
-        return img,
+        return (img,)
 
-    ani = animation.FuncAnimation(fig, updatefig, frames=saveTensor.shape[0],                                  interval=interval, blit=True)
+    ani = animation.FuncAnimation(
+        fig, updatefig, frames=saveTensor.shape[0], interval=interval, blit=True
+    )
     plt.colorbar()
     ani.save(filename, writer="ffmpeg", fps=15)

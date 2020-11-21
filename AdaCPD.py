@@ -12,7 +12,7 @@ from Utils import lookup, proxr, sample_fibers, sampled_kr
 def AdaCPD(X, b0, n_mb, mttrks, A_init, eta=1):
     A = A_init
 
-    eta=1
+    eta = 1
 
     # setup parameters
     dim = len(X.shape)
@@ -26,7 +26,7 @@ def AdaCPD(X, b0, n_mb, mttrks, A_init, eta=1):
 
     NRE_A = [err_e]
 
-    max_it = (X.shape[0]**2 / n_mb) * mttrks
+    max_it = (X.shape[0] ** 2 / n_mb) * mttrks
 
     tic = time.time()
 
@@ -49,7 +49,9 @@ def AdaCPD(X, b0, n_mb, mttrks, A_init, eta=1):
 
         cols = [tensor_idx[:, x] for x in range(len(tensor_idx[0]))]
         X_sample = X[tuple(cols)]
-        X_sample = X_sample.reshape((int(X_sample.size / dim_vec[d_update]), dim_vec[d_update]))
+        X_sample = X_sample.reshape(
+            (int(X_sample.size / dim_vec[d_update]), dim_vec[d_update])
+        )
 
         # perform a sampled khatrirao product
         A_unsel = []
@@ -61,7 +63,9 @@ def AdaCPD(X, b0, n_mb, mttrks, A_init, eta=1):
 
         # compute the gradient
         g = (1 / n_mb) * (
-            A[d_update] @ (H.transpose() @ H + mu * np.eye(F)) - X_sample.transpose() @ H - mu * A[d_update]
+            A[d_update] @ (H.transpose() @ H + mu * np.eye(F))
+            - X_sample.transpose() @ H
+            - mu * A[d_update]
         )
 
         # compute the accumlated gradient
@@ -71,8 +75,6 @@ def AdaCPD(X, b0, n_mb, mttrks, A_init, eta=1):
         print(A[d_update].shape)
         d = d_update
         A[d_update] = A[d_update] - np.multiply(eta_adapted, g)
-
-        
 
         A[d_update] = proxr(A[d_update], d)
 

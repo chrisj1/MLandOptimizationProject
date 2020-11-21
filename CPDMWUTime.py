@@ -6,6 +6,7 @@ from numpy.linalg import pinv, norm
 import tensorly.tenalg as tl_alg
 from Utils import error
 
+
 def sketching_weight(sketching_rate, weights):
     r = random.uniform(0, sum(weights))
     total_sum = 0
@@ -68,7 +69,9 @@ def update_weights(
     return
 
 
-def CPDMWUTime(X, F, sketching_rates, lamb, eps, nu, Hinit, max_time, sample_interval=.5):
+def CPDMWUTime(
+    X, F, sketching_rates, lamb, eps, nu, Hinit, max_time, sample_interval=0.5
+):
     weights = np.array([1] * len(sketching_rates)) / (len(sketching_rates))
 
     dim_1, dim_2, dim_3 = X.shape
@@ -79,10 +82,10 @@ def CPDMWUTime(X, F, sketching_rates, lamb, eps, nu, Hinit, max_time, sample_int
     norm_x = norm(X)
     I = np.eye(F)
 
-    PP = tl.kruskal_to_tensor((np.ones(F), [A,B,C]))
-    error = np.linalg.norm(X - PP) ** 2/norm_x
+    PP = tl.kruskal_to_tensor((np.ones(F), [A, B, C]))
+    error = np.linalg.norm(X - PP) ** 2 / norm_x
 
-    NRE_A = {0:error}
+    NRE_A = {0: error}
 
     start = time.time()
 
@@ -91,7 +94,7 @@ def CPDMWUTime(X, F, sketching_rates, lamb, eps, nu, Hinit, max_time, sample_int
     itr = 1
     while now - start < max_time:
         s = sketching_weight(sketching_rates, weights)
-        
+
         # Solve Ridge Regression for A,B,C
         A, B, C = update_factors(A, B, C, X_unfold, I, lamb, s, F)
 
@@ -101,12 +104,16 @@ def CPDMWUTime(X, F, sketching_rates, lamb, eps, nu, Hinit, max_time, sample_int
             update_weights(
                 A, B, C, X_unfold, I, norm_x, lamb, weights, sketching_rates, F, nu, eps
             )
-        now = time.time()            
-        PP = tl.kruskal_to_tensor((np.ones(F), [A,B,C]))
-        error = np.linalg.norm(X - PP) ** 2/norm_x
+        now = time.time()
+        PP = tl.kruskal_to_tensor((np.ones(F), [A, B, C]))
+        error = np.linalg.norm(X - PP) ** 2 / norm_x
         elapsed = now - start
         NRE_A[elapsed] = error
         sketching_rates_selected[elapsed] = s
-        print("iteration: {}  t: {}  s: {}   error: {}  rates: {}".format(itr,elapsed, s,error, sketching_rates))
-        itr+=1
-    return A, B, C, NRE_A,sketching_rates_selected
+        print(
+            "iteration: {}  t: {}  s: {}   error: {}  rates: {}".format(
+                itr, elapsed, s, error, sketching_rates
+            )
+        )
+        itr += 1
+    return A, B, C, NRE_A, sketching_rates_selected

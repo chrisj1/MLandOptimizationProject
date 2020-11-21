@@ -9,7 +9,7 @@ from itertools import permutations
 from Utils import lookup, proxr, sample_fibers, sampled_kr
 
 
-def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500,eta=1):
+def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500, eta=1):
     A = A_init
     print(A)
 
@@ -23,7 +23,7 @@ def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500,eta=1):
 
     err_e = (np.linalg.norm(X[..., :] - PP[..., :]) ** 2) / norm(X)
 
-    NRE_A = {0:err_e}
+    NRE_A = {0: err_e}
 
     start = time.time()
 
@@ -45,7 +45,9 @@ def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500,eta=1):
 
         cols = [tensor_idx[:, x] for x in range(len(tensor_idx[0]))]
         X_sample = X[tuple(cols)]
-        X_sample = X_sample.reshape((int(X_sample.size / dim_vec[d_update]), dim_vec[d_update]))
+        X_sample = X_sample.reshape(
+            (int(X_sample.size / dim_vec[d_update]), dim_vec[d_update])
+        )
 
         # perform a sampled khatrirao product
         A_unsel = []
@@ -57,7 +59,9 @@ def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500,eta=1):
 
         # compute the gradient
         g = (1 / n_mb) * (
-            A[d_update] @ (H.transpose() @ H + mu * np.eye(F)) - X_sample.transpose() @ H - mu * A[d_update]
+            A[d_update] @ (H.transpose() @ H + mu * np.eye(F))
+            - X_sample.transpose() @ H
+            - mu * A[d_update]
         )
 
         # compute the accumlated gradient
@@ -74,7 +78,7 @@ def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500,eta=1):
         t = time.time()
 
         PP = tl.kruskal_to_tensor((np.ones(F), A))
-        error = np.linalg.norm(X - PP) ** 2/norm(X)
+        error = np.linalg.norm(X - PP) ** 2 / norm(X)
         NRE_A[t - start] = error
 
     return (NRE_A, A)

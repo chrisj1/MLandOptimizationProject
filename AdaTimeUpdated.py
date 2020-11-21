@@ -6,7 +6,7 @@ import os
 from joblib import Parallel, delayed
 import multiprocessing
 
-fiberPropotions = [.001, .005, .01, .05, .1, .25, .5, 1]
+fiberPropotions = [0.001, 0.005, 0.01, 0.05, 0.1, 0.25, 0.5, 1]
 
 Rank = 100
 
@@ -26,35 +26,51 @@ for fiberPropotion in fiberPropotions:
         for trial in range(Trials):
             arrangements.append((fiberPropotion, Size, trial, Rank, maxtime, dir))
 
-def saveAdaTimeTrial(X, fiberPropotion, Size, trial, Rank,b0, max_time, error,dir):
-    filename = '{}/AdaResults_{}_{}_{}_{}_{}_{}.dat'.format(dir,fiberPropotion, Size, trial, Rank,b0, max_time)
+
+def saveAdaTimeTrial(X, fiberPropotion, Size, trial, Rank, b0, max_time, error, dir):
+    filename = "{}/AdaResults_{}_{}_{}_{}_{}_{}.dat".format(
+        dir, fiberPropotion, Size, trial, Rank, b0, max_time
+    )
     results = {
-        'fiberPropotion':fiberPropotion, 'Size':Size, 'trial':trial, 'Rank':Rank, 'b0':b0, 'max_time':max_time, 'error':error
+        "fiberPropotion": fiberPropotion,
+        "Size": Size,
+        "trial": trial,
+        "Rank": Rank,
+        "b0": b0,
+        "max_time": max_time,
+        "error": error,
     }
-    with open(filename, 'wb') as f:
+    with open(filename, "wb") as f:
         pickle.dump(results, f)
 
 
 def runTest(conf):
-    fiberPropotion, Size, trial, Rank, max_time,dir = conf
-    print("Running video trial with the following:\n\tProporion of Fibers = {}\n\tSize = {}\n\tRank = {}\n\tTrialNumber = {}\n\tMax Time = {}".format(fiberPropotion, Size, Rank, trial, maxtime))
-    numberOfFibers = Size**2
-    FibersSampled = max(int(numberOfFibers * fiberPropotion),1)
+    fiberPropotion, Size, trial, Rank, max_time, dir = conf
+    print(
+        "Running video trial with the following:\n\tProporion of Fibers = {}\n\tSize = {}\n\tRank = {}\n\tTrialNumber = {}\n\tMax Time = {}".format(
+            fiberPropotion, Size, Rank, trial, maxtime
+        )
+    )
+    numberOfFibers = Size ** 2
+    FibersSampled = max(int(numberOfFibers * fiberPropotion), 1)
 
-    #Create tensor
-    X = videoToTensor('600Test.mp4')
+    # Create tensor
+    X = videoToTensor("600Test.mp4")
 
-    #init starting
-    A_init = initDecomposition(Size,Rank)
+    # init starting
+    A_init = initDecomposition(Size, Rank)
 
-    b0 = .25
+    b0 = 0.25
 
     print(X, b0, FibersSampled)
 
-    error,_ = AdaCPDTime(X, b0, FibersSampled, max_time, A_init, sample_interval=.5,eta=1)
-    saveAdaTimeTrial(X, fiberPropotion, Size, trial, Rank, b0, max_time, error,dir)
+    error, _ = AdaCPDTime(
+        X, b0, FibersSampled, max_time, A_init, sample_interval=0.5, eta=1
+    )
+    saveAdaTimeTrial(X, fiberPropotion, Size, trial, Rank, b0, max_time, error, dir)
+
 
 num_cores = 2
-datas = Parallel(n_jobs=num_cores, verbose=100)(delayed(
-    runTest)(i)for i in arrangements)
-
+datas = Parallel(n_jobs=num_cores, verbose=100)(
+    delayed(runTest)(i) for i in arrangements
+)
