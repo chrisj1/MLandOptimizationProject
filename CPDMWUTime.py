@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 import random
 import tensorly as tl
 import time
@@ -92,28 +93,31 @@ def CPDMWUTime(
     sketching_rates_selected = {}
     now = time.time()
     itr = 1
-    while now - start < max_time:
-        s = sketching_weight(sketching_rates, weights)
+    with tqdm(position=0) as pbar:
+        while now - start < max_time:
+            s = sketching_weight(sketching_rates, weights)
 
-        # Solve Ridge Regression for A,B,C
-        A, B, C = update_factors(A, B, C, X_unfold, I, lamb, s, F)
+            # Solve Ridge Regression for A,B,C
+            A, B, C = update_factors(A, B, C, X_unfold, I, lamb, s, F)
 
-        # Update weights
-        p = np.random.binomial(n=1, p=eps)
-        if p == 1 and len(sketching_rates) > 1:
-            update_weights(
-                A, B, C, X_unfold, I, norm_x, lamb, weights, sketching_rates, F, nu, eps
+            # Update weights
+            p = np.random.binomial(n=1, p=eps)
+            if p == 1 and len(sketching_rates) > 1:
+                update_weights(
+                    A, B, C, X_unfold, I, norm_x, lamb, weights, sketching_rates, F, nu, eps
+                )
+            now = time.time()
+            PP = tl.kruskal_to_tensor((np.ones(F), [A, B, C]))
+            error = np.linalg.norm(X - PP) ** 2 / norm_x
+            elapsed = now - start
+            NRE_A[elapsed] = error
+            sketching_rates_selected[elapsed] = s
+            pbar.set_description(
+                "iteration: {}  t: {:.5f}  s: {}   error: {:.5f}  rates: {}".format(
+                    itr, elapsed, s, error, sketching_rates
+                )
             )
-        now = time.time()
-        PP = tl.kruskal_to_tensor((np.ones(F), [A, B, C]))
-        error = np.linalg.norm(X - PP) ** 2 / norm_x
-        elapsed = now - start
-        NRE_A[elapsed] = error
-        sketching_rates_selected[elapsed] = s
-        print(
-            "iteration: {}  t: {}  s: {}   error: {}  rates: {}".format(
-                itr, elapsed, s, error, sketching_rates
-            )
-        )
-        itr += 1
+            itr += 1
+            pbar.update(1)
+
     return A, B, C, NRE_A, sketching_rates_selected
