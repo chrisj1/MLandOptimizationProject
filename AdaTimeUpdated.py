@@ -6,6 +6,7 @@ import os
 from joblib import Parallel, delayed
 import multiprocessing
 from tqdm import tqdm
+import itertools
 
 fiberPropotions = [.001, .005, .01, .05, .1, .25, .5, 1]
 
@@ -39,12 +40,9 @@ def saveAdaTimeTrial(X, fiberPropotion, Size, trial, Rank,b0, max_time, error,di
 def runTest(conf):
     fiberPropotion, Size, trial, Rank, max_time,dir = conf
     print("Running video trial with the following:\n\tProporion of Fibers = {}\n\tSize = {}\n\tRank = {}\n\tTrialNumber = {}\n\tMax Time = {}".format(fiberPropotion, Size, Rank, trial, maxtime))
-    
-    t = 1
-    for s in Size:
-        t *= s
+    sizes = list(itertools.combinations(Size, 2))
 
-    numberOfFibers = s
+    numberOfFibers = sum(map(lambda t : t[0] * t[1], sizes))
     FibersSampled = max(int(numberOfFibers * fiberPropotion),1)
 
     #Create tensor
