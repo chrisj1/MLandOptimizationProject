@@ -6,6 +6,7 @@ from numpy.linalg import pinv, norm
 import tensorly.tenalg as tl_alg
 from Utils import error
 
+
 def sketching_weight(sketching_rate, weights):
     r = random.uniform(0, sum(weights))
     total_sum = 0
@@ -104,13 +105,13 @@ def CPD_MWU(X, F, sketching_rates, lamb, eps, nu, Hinit, mttkrps=30):
                 A, B, C, X_unfold, I, norm_x, lamb, weights, sketching_rates, F, nu, eps
             )
         if iter_mttkrp > last + 1:
-            PP = tl.kruskal_to_tensor((np.ones(F), [A,B,C]))
+            PP = tl.kruskal_to_tensor((np.ones(F), [A, B, C]))
             error = np.linalg.norm(X - PP) ** 2
-            print("error: {}, mttkrps: {}".format(error/norm(X), int(iter_mttkrp)))
+            print("error: {}, mttkrps: {}".format(error / norm(X), int(iter_mttkrp)))
             now = time.time()
-            errors[iter_mttkrp] = error/norm(X)
+            errors[iter_mttkrp] = error / norm(X)
             end = time.time()
             res_time[iter_mttkrp] = now - start
-            last+=1
-        i+=1
+            last += 1
+        i += 1
     return A, B, C, errors, res_time

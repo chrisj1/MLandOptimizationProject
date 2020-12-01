@@ -6,6 +6,7 @@ from joblib import Parallel, delayed
 import multiprocessing
 import csv
 import os
+
 # Rank
 Fs = [50]
 
@@ -18,26 +19,23 @@ sizes = [200]
 
 num_trials = 2
 
-bs = [5,10,20,30,40,50,75,150,200]
+bs = [5, 10, 20, 30, 40, 50, 75, 150, 200]
 # b0s = [.5]
-b0s = [.25]
+b0s = [0.25]
+
 
 def RunTest(conf):
     F, size, n_mb, b0, trial = conf
     # input tensor X
     X = np.zeros((size, size, size))
 
-    print(
-        "==========================================================================="
-    )
+    print("===========================================================================")
     print(
         "Running AdaCPD at trial {} : I equals {} and F equals {}".format(
             trial, size, F
         )
     )
-    print(
-        "==========================================================================="
-    )
+    print("===========================================================================")
 
     I = [size] * 3
 
@@ -65,30 +63,54 @@ def RunTest(conf):
     fig = plt.figure()
     ax = plt.gca()
     ax.scatter([x for x in range(len(NRE_A))], NRE_A)
-    ax.set_yscale('log')
-    plt.ylabel('Cost')
-    plt.xlabel('MTTRKS')
+    ax.set_yscale("log")
+    plt.ylabel("Cost")
+    plt.xlabel("MTTRKS")
 
-    plt.title('AdaCPD with \n'
-              'Rank={}, Size={}, fibers sampled={}, b0={}, trial={}'.format(F, size, n_mb, b0, trial))
+    plt.title(
+        "AdaCPD with \n"
+        "Rank={}, Size={}, fibers sampled={}, b0={}, trial={}".format(
+            F, size, n_mb, b0, trial
+        )
+    )
 
-    plt.savefig('AdaCostF{}I{}nmb{}b0{}trial{}.png'.format(F, size, n_mb, b0, trial))
+    plt.savefig("AdaCostF{}I{}nmb{}b0{}trial{}.png".format(F, size, n_mb, b0, trial))
 
     plt.close()
 
     total = sum(time_A)
 
-    return {'Tensor Rank':F, 'Decomposition Rank':F, 'Size':size, 'b0':b0,'Number of Fibers':n_mb, 'Trial Number':trial, 'Cost':NRE_A[-1], 'Total Time':total}
+    return {
+        "Tensor Rank": F,
+        "Decomposition Rank": F,
+        "Size": size,
+        "b0": b0,
+        "Number of Fibers": n_mb,
+        "Trial Number": trial,
+        "Cost": NRE_A[-1],
+        "Total Time": total,
+    }
+
 
 arrangements = []
 
-there = os.path.exists('Adadata.csv')
+there = os.path.exists("Adadata.csv")
 
-with open('Adadata.csv','a') as file:
+with open("Adadata.csv", "a") as file:
 
-    fieldnames = ['Tensor Rank', 'Decomposition Rank', 'Size', 'b0','Number of Fibers', 'Trial Number', 'Cost', 'Total Time']
+    fieldnames = [
+        "Tensor Rank",
+        "Decomposition Rank",
+        "Size",
+        "b0",
+        "Number of Fibers",
+        "Trial Number",
+        "Cost",
+        "Total Time",
+    ]
     writer = csv.DictWriter(file, fieldnames=fieldnames)
-    if not there: writer.writeheader()
+    if not there:
+        writer.writeheader()
     for F in Fs:
         for size in sizes:
             for n_mb in bs:
@@ -96,9 +118,10 @@ with open('Adadata.csv','a') as file:
                     for trial in range(num_trials):
                         arrangements.append((F, size, n_mb, b0, trial))
 
-    num_cores = int(multiprocessing.cpu_count()-2)
-    datas = Parallel(n_jobs=num_cores, verbose=100)(delayed(
-        RunTest)(i)for i in arrangements)
+    num_cores = int(multiprocessing.cpu_count() - 2)
+    datas = Parallel(n_jobs=num_cores, verbose=100)(
+        delayed(RunTest)(i) for i in arrangements
+    )
 
     for data in datas:
         writer.writerow(data)

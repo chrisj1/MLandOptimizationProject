@@ -12,9 +12,7 @@ F = 100
 
 # X, _ = synteticTensor([100,100,100], F)
 
-X = videoToTensor(
-    "testvideo"
-)
+X = videoToTensor("testvideo")
 
 X = X / 256
 
@@ -32,14 +30,13 @@ shape = (300, 300, 300)
 nu = 2
 
 A, B, C, error, res_time = CPD_MWU(
-    X, F, sketching_rates, lamb, .0001, nu, Hinit, mttkrps=3
+    X, F, sketching_rates, lamb, 0.0001, nu, Hinit, mttkrps=3
 )
 
-Hinit = [A,B,C]
+Hinit = [A, B, C]
 
 time_A, NRE_A, MSE_A, A = AdaCPD(X, 1, 100, 10, Hinit, None)
 
 reconstructed = PP = tl.kruskal_to_tensor((np.ones(F), A))
 
-tensorToVideo(reconstructed, 'reconstruced')
-
+tensorToVideo(reconstructed, "reconstruced")

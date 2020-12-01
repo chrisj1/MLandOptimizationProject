@@ -17,7 +17,7 @@ num_trials = 1
 
 bs = [18]
 
-b0s = [.1]
+b0s = [0.1]
 
 for i0 in range(len(Fs)):
     F = Fs[i0]
