@@ -11,7 +11,6 @@ from Utils import lookup, proxr, sample_fibers, sampled_kr
 
 def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500, eta=1):
     A = A_init
-    print(A)
 
     # setup parameters
     dim = len(X.shape)

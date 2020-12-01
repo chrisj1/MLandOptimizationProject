@@ -67,7 +67,6 @@ def RunTest(conf):
 
     heristic = np.divide(cost_diff, time_diff)
 
-    print(heristic)
 
     fig = plt.figure()
     ax = plt.gca()
@@ -167,7 +166,6 @@ for s in sizes:
     results = np.array(results)
     average = np.mean(results, axis=0)
     std = np.std(results, axis=0)
-    print(average)
     ax.scatter(
         [x for x in range(5, len(average))], average[5:], label="size {}".format(s)
     )

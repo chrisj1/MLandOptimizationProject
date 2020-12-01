@@ -71,13 +71,7 @@ def runTest(conf):
     )
     saveAdaTimeTrial(X, fiberPropotion, Size, trial, Rank, b0, max_time, error, dir)
 
-<<<<<<< HEAD
-num_cores = 2
-datas = Parallel(n_jobs=num_cores, verbose=100)(delayed(runTest)(i) for i in tqdm(arrangements, position=0))
-=======
->>>>>>> 5c0094181531b881c7310d5213b4d61c1fe80464
-
 num_cores = 2
 datas = Parallel(n_jobs=num_cores, verbose=100)(
-    delayed(runTest)(i) for i in arrangements
+    delayed(runTest)(i) for i in tqdm(arrangements, position=0)
 )
