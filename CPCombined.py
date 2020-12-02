@@ -1,6 +1,5 @@
 import numpy as np
 from numpy.linalg import norm
-from PerformanceMetrics import MSE
 import math
 import time
 from itertools import permutations
@@ -150,6 +149,7 @@ def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, et
     weights = np.array([1] * (len(sketching_rates))) / (len(sketching_rates))
     global Gt
     Gt = []
+    print(sketching_rates)
 
     dim_1, dim_2, dim_3 = X.shape
     A, B, C = Hinit[0], Hinit[1], Hinit[2]
