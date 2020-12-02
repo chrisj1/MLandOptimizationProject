@@ -13,27 +13,31 @@ import cv2
 
 from cv2 import VideoWriter, VideoWriter_fourcc
 
-
 def initDecomposition(Size, F, min=0, max=1):
+    t = 1
+    for s in Size:
+        t *= s
     # initialize the latent factors
     Hinit = []
-    for d in range(3):
-        Hinit.append(np.random.random((Size, F)))
+    for d in Size:
+        Hinit.append(np.random.random((d, F)))
     return Hinit
 
-
-def createTensor(size, F):
-    X = np.zeros((size, size, size))
+def createTensor(size,F):
+    t = 1
+    for s in size:
+        t *= s
+    X = np.zeros(size)
 
     # generate true latent factors
     A = []
-    for i in range(3):
-        A.append(np.random.random((size, F)))
+    for s in size:
+        A.append(np.random.random((s, F)))
 
     A_gt = A
 
     # form the tensor
-    for k in range(size):
+    for k in range(size[2]):
         X[:, :, k] = A[0] @ np.diag(A[2][k, :]) @ np.transpose(A[1])
     return X
 

@@ -16,7 +16,7 @@ fiberPropotions = np.linspace(0.001, 1, N)
 
 Rank = 50
 
-Sizes = [(50, 20), (100, 60), (200, 180), (300, 300), (400, 900)]
+Sizes = [((50,30,20), 20), ((100,100,100), 60), ((200,200,200), 180), ((300,300,300), 300), ((400,400,400), 900)]
 
 Trials = 5
 
@@ -28,17 +28,17 @@ c_eta = float(sys.argv[2])
 dir = str(time.time())
 os.mkdir(dir)
 
-for c_eta in c_etas:
-    for trial in range(Trials):
-        for Size, maxtime in Sizes:
-            arrangements.append(
-                (fiberPropotions, Size, trial, Rank, maxtime, dir, c_eps, c_eta)
-            )
-
-# for fiberPropotion in fiberPropotions:
+# for c_eta in c_etas:
 #     for trial in range(Trials):
-#         for Size,maxtime in Sizes:
-#             arrangements.append(([fiberPropotion], Size, trial, Rank, maxtime, dir))
+#         for Size, maxtime in Sizes:
+#             arrangements.append(
+#                 (fiberPropotions, Size, trial, Rank, maxtime, dir, c_eps, c_eta)
+#             )
+
+for fiberPropotion in fiberPropotions:
+    for trial in range(Trials):
+        for Size,maxtime in Sizes:
+            arrangements.append(([fiberPropotion], Size, trial, Rank, maxtime, dir, c_eps, c_eta))
 
 
 def saveCPDTimeTrial(

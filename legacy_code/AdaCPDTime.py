@@ -11,7 +11,6 @@ from Utils import lookup, proxr, sample_fibers, sampled_kr
 
 def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500, eta=1):
     A = A_init
-    print(A)
 
     # setup parameters
     dim = len(X.shape)
@@ -21,7 +20,7 @@ def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500, eta=1):
 
     PP = tl.kruskal_to_tensor((np.ones(F), A))
 
-    err_e = (np.linalg.norm(X[..., :] - PP[..., :]) ** 2) / norm(X)
+    err_e = ((np.linalg.norm(X[..., :] - PP[..., :]) ** 2)) / norm(X)
 
     NRE_A = {0: err_e}
 
@@ -70,7 +69,7 @@ def AdaCPDTime(X, b0, n_mb, max_time, A_init, sample_interval=500, eta=1):
         eta_adapted = np.divide(eta, np.sqrt(Gt[d_update]))
 
         d = d_update
-        print(A[d_update])
+        # print(A[d_update])
         A[d_update] = A[d_update] - np.multiply(eta_adapted, g)
 
         A[d_update] = proxr(A[d_update], d)
