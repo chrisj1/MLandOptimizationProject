@@ -37,9 +37,9 @@ lamb = 0.0001
 
 proprtions = np.linspace(0.1, 1, num=5)
 
-eta_cpd = 0.001
+eta_cpd = 0.0005
 
-eps = 0.1
+eps = 0.2
 
 for i in range(trials):
     X = createTensor(Size, Rank)
@@ -66,7 +66,7 @@ for i in range(trials):
     )
 
     errors_sketechedALS_1.append(NRE_A[list(NRE_A.keys())[-1]])
-
+    eps = 0.15
     sketching_rates = [
         (p, False) for p in proprtions
     ]  # Sketched ALS with multiple sketching rates
@@ -85,7 +85,7 @@ for i in range(trials):
     )
 
     errors_sketechedALS.append(NRE_A[list(NRE_A.keys())[-1]])
-
+    eps = 0.08
     sketching_rates = [(p, True) for p in proprtions] + [
         (p, False) for p in proprtions
     ]  # both algorithims
@@ -138,7 +138,7 @@ for i in range(trials):
     )
 
     errors_adagrad_5.append(NRE_A[list(NRE_A.keys())[-1]])
-
+    eps = .15
     sketching_rates = [
         (p, True) for p in proprtions
     ]  # CPDMWU with adagrad for all sketching rates

@@ -12,6 +12,9 @@ from Utils import error, lookup, proxr, sample_fibers, sampled_kr, weightsStr
 from timer import Timer
 
 
+"""
+Picks a sketching rate from weights
+"""
 def sketching_weight(sketching_rate, weights):
     r = random.uniform(0, sum(weights))
     total_sum = 0
@@ -23,12 +26,17 @@ def sketching_weight(sketching_rate, weights):
     return sketching_rate[-1][0], sketching_rate[-1][1]
 
 
+"""
+Picks the indices of the columns to sketch
+"""
 def sketch_indices(s, total_col):
     return np.random.choice(
         range(total_col), size=int(s * total_col), replace=False, p=None
     )
 
-
+"""
+Solves the ALS subproblems
+"""
 def update_factors(A, B, C, X_unfold, Id, lamb, s, rank):
     # Update A
     dim_1, dim_2 = X_unfold[0].shape
@@ -103,7 +111,9 @@ def AdaIteration(X, X_unfold, A_mat, B_mat, C_mat, b0, eta, F, errors, n_mb, nor
         A[d_update] = A[d_update] - np.multiply(eta_adapted, g)
     return A[0], A[1], A[2], errors
 
-
+"""
+Updated the weights for MWU
+"""
 def update_weights(
     X,
     A,
@@ -144,7 +154,6 @@ def update_weights(
     weights /= np.sum(weights)
 
 
-# X, Rank, proprtions, lamb, eps, eta_cpd, A_init, 1000, b0, eta_ada
 def decompose(X, F, sketching_rates, lamb, eps, eta_cpd, Hinit, max_time, b0, eta_ada):
     weights = np.array([1] * (len(sketching_rates))) / (len(sketching_rates))
     global Gt
