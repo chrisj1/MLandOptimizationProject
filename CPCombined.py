@@ -7,7 +7,7 @@ import random
 import tensorly as tl
 import tensorly.tenalg as tl_alg
 from numpy.linalg import pinv, norm
-from Utils import error, lookup, proxr, sample_fibers, sampled_kr, weightsStr
+from Utils import error, sample_fibers, sampled_kr, weightsStr
 
 from timer import Timer
 
