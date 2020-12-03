@@ -9,3 +9,7 @@ Chris Jerrett, Chris Vanderloo, Mathew Scanlon, Min Yue
  - LargeNumberofTests.py - Runs decompositions on a large number of tensors and computes statistics for the final error
  - timer.py A simple timer clas
  - videoTest.py - Runs the video decomposition tests
+
+To run the tests just run python3 filename
+
+Requires tensorly, numpy and matplotlib
