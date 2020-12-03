@@ -8,3 +8,4 @@ Chris Jerrett, Chris Vanderloo, Mathew Scanlon, Min Yue
  - CPCombinedTests.py - Runs the decomposition on tensors of various sizes and ranks
  - LargeNumberofTests.py - Runs decompositions on a large number of tensors and computes statistics for the final error
  - timer.py A simple timer clas
+ - videoTest.py - Runs the video decomposition tests
