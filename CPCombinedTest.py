@@ -196,74 +196,74 @@ for trial in range(trials):
                 open(f"{testname}adagrad{Size},{Rank},{trial}.dat", "wb"),
             )
 
-            # sketching_rates = [(p, False) for p in proprtions]
-            # # eps = 1/(2*len(sketching_rates))
-            # A, B, C, NRE_A, weights = decompose(
-            #     X,
-            #     Rank,
-            #     sketching_rates,
-            #     lamb,
-            #     eps,
-            #     eta_cpd,
-            #     A_init,
-            #     max_time,
-            #     b0,
-            #     eta_ada,
-            # )
-            # fig, (ax1, ax2) = plt.subplots(2, 1)
-            # fig.suptitle("Loss and Weights for Decomposition")
-            # viridis = cm.get_cmap("viridis", len(proprtions))
-            # ax1.set_title("Error")
+            sketching_rates = [(p, False) for p in proprtions]
+            # eps = 1/(2*len(sketching_rates))
+            A, B, C, NRE_A, weights = decompose(
+                X,
+                Rank,
+                sketching_rates,
+                lamb,
+                eps,
+                eta_cpd,
+                A_init,
+                max_time,
+                b0,
+                eta_ada,
+            )
+            fig, (ax1, ax2) = plt.subplots(2, 1)
+            fig.suptitle("Loss and Weights for Decomposition")
+            viridis = cm.get_cmap("viridis", len(proprtions))
+            ax1.set_title("Error")
 
-            # handles = [
-            #     mpatches.Patch(color=viridis(p), label=f"{p} sketching rate")
-            #     for p in proprtions
-            # ]
-            # handles = handles + [
-            #     mlines.Line2D([], [], color="black", marker="o", label="Adagrad"),
-            #     mlines.Line2D([], [], color="black", marker="x", label="Sketched ALS"),
-            # ]
-            # # handles.append()
-            # ax1.legend(handles=handles)
-            # ax1.set_yscale("log")
-            # for t in NRE_A:
-            #     e, grad, s = NRE_A[t]
-            #     m = "o" if sketching_rates[i][1] else "x"
-            #     ax1.scatter([t], [e], color=viridis(s), marker=m)
+            handles = [
+                mpatches.Patch(color=viridis(p), label=f"{p} sketching rate")
+                for p in proprtions
+            ]
+            handles = handles + [
+                mlines.Line2D([], [], color="black", marker="o", label="Adagrad"),
+                mlines.Line2D([], [], color="black", marker="x", label="Sketched ALS"),
+            ]
+            # handles.append()
+            ax1.legend(handles=handles)
+            ax1.set_yscale("log")
+            for t in NRE_A:
+                e, grad, s = NRE_A[t]
+                m = "o" if sketching_rates[i][1] else "x"
+                ax1.scatter([t], [e], color=viridis(s), marker=m)
 
-            # weights_t = list(weights.keys())
-            # ax2.set_title("Probability Weights")
-            # for i in range(0, len(sketching_rates)):
-            #     weight_y = []
-            #     for t in weights_t:
-            #         weight_y.append(weights[t][i])
-            #     m = "o" if sketching_rates[i][1] else "x"
-            #     ax2.plot(
-            #         weights_t, weight_y, color=viridis(sketching_rates[i][0]), marker=m
-            #     )
-            # ax2.legend(handles=handles)
-            # fig = mpl.pyplot.gcf()
-            # fig.set_size_inches(18.5, 10.5)
-            # plt.savefig(f"{testname}als{Size},{Rank},{trial}.svg")
-            # ax2.set_yscale("log")
-            # plt.savefig(f"{testname}als{Size},{Rank},{trial}log.svg")
-            # pickle.dump(
-            #     (
-            #         A,
-            #         B,
-            #         C,
-            #         NRE_A,
-            #         weights,
-            #         X,
-            #         Rank,
-            #         sketching_rates,
-            #         lamb,
-            #         eps,
-            #         eta_cpd,
-            #         A_init,
-            #         max_time,
-            #         b0,
-            #         eta_ada,
-            #     ),
-            #     open(f"{testname}sketch-als{Size},{Rank},{trial}.dat", "wb"),
-            # )
+            weights_t = list(weights.keys())
+            ax2.set_title("Probability Weights")
+            for i in range(0, len(sketching_rates)):
+                weight_y = []
+                for t in weights_t:
+                    weight_y.append(weights[t][i])
+                m = "o" if sketching_rates[i][1] else "x"
+                ax2.plot(
+                    weights_t, weight_y, color=viridis(sketching_rates[i][0]), marker=m
+                )
+            ax2.legend(handles=handles)
+            fig = mpl.pyplot.gcf()
+            fig.set_size_inches(18.5, 10.5)
+            plt.savefig(f"{testname}als{Size},{Rank},{trial}.svg")
+            ax2.set_yscale("log")
+            plt.savefig(f"{testname}als{Size},{Rank},{trial}log.svg")
+            pickle.dump(
+                (
+                    A,
+                    B,
+                    C,
+                    NRE_A,
+                    weights,
+                    X,
+                    Rank,
+                    sketching_rates,
+                    lamb,
+                    eps,
+                    eta_cpd,
+                    A_init,
+                    max_time,
+                    b0,
+                    eta_ada,
+                ),
+                open(f"{testname}sketch-als{Size},{Rank},{trial}.dat", "wb"),
+            )
